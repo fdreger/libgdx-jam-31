@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.10" tiledversion="1.10.2" name="District" tilewidth="8" tileheight="8" tilecount="960" columns="32">
+<tileset version="1.10" tiledversion="1.11.0" name="District" tilewidth="8" tileheight="8" tilecount="960" columns="32">
  <image source="District.png" width="256" height="240"/>
  <tile id="14">
   <properties>
@@ -10,8 +10,8 @@
  <tile id="298" type="bouncer">
   <properties>
    <property name="bounces" type="bool" value="true"/>
-   <property name="dx" type="float" value="20"/>
-   <property name="dy" type="float" value="20"/>
+   <property name="dx" type="float" value="0"/>
+   <property name="dy" type="float" value="0"/>
    <property name="kills" type="bool" value="true"/>
   </properties>
   <animation>

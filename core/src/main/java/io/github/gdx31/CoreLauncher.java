@@ -10,6 +10,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -19,6 +20,7 @@ import com.github.tommyettinger.textra.TypingListener;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class CoreLauncher extends ApplicationAdapter {
     private SpriteBatch batch;
@@ -33,10 +35,9 @@ public class CoreLauncher extends ApplicationAdapter {
     private boolean isMenuVisible;
     private Stage stage;
     private TypingLabel typingLabel;
-    private List<String> texts = Arrays.asList(
-        "Welcome to the Game! I am your guide.%",
-        "Did you know? You can jump by pressing the space bar.%",
-        "Watch out for the enemies! They can be tricky.%"
+    private final Map<String, String> texts = Map.of(
+        "1", "This should appear on the top of the screen."
+
     );
     private int currentTextIndex = ~0;
 
@@ -61,30 +62,33 @@ public class CoreLauncher extends ApplicationAdapter {
         mainMenu = new MainMenu();
         isMenuVisible = false;
 
-        stage = new Stage(new ScreenViewport());
+        stage = new Stage(new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight()), batch);
 
-        FWSkin skin = new FWSkin(Gdx.files.internal("ui/uiskin.json"));
+        Skin skin = new FWSkin(Gdx.files.internal("ui/uiskin.json"));
         typingLabel = new TypingLabel("        ", skin);
+        typingLabel.setTextSpeed(0.1f);
         typingLabel.setPosition(10, Gdx.graphics.getHeight() - 50);
         stage.addActor(typingLabel);
 
         typingLabel.setTypingListener(new TypingListenerAdapter() {
             @Override
-            public void onChar(long ch) {
-                if ((char)ch == '%') {
-                    currentTextIndex = ~currentTextIndex;
+            public void event(String event) {
+                if (event.startsWith("next")) {
+                    nextText(event.split(":")[1]);
                 }
+                eventHappens(event);
             }
         });
 
     }
 
-    private void nextText() {
-        if (currentTextIndex < texts.size()) {
-            typingLabel.setText(texts.get(currentTextIndex));
-            typingLabel.restart();
-        }
-        currentTextIndex++;
+    private void eventHappens(String event) {
+
+    }
+
+    private void nextText(String next) {
+        typingLabel.setText(texts.get(next));
+        typingLabel.restart();
     }
 
     @Override
@@ -92,7 +96,7 @@ public class CoreLauncher extends ApplicationAdapter {
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
         if (currentTextIndex < 0) {
             currentTextIndex = ~currentTextIndex;
-            nextText();
+            nextText("1");
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {

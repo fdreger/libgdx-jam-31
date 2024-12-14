@@ -133,7 +133,6 @@ public class WorldState {
     private Vector2 savePoint = new Vector2();
 
     public void setSavePoint(float x, float y) {
-        // remember save point for when player gets killed
         savePoint.set(x, y);
     }
 
