@@ -23,15 +23,22 @@ public class MainMenu extends ScreenAdapter {
         table.setFillParent(true);
         stage.addActor(table);
 
-        TextButton startButton = new TextButton("Start", skin);
-        TextButton optionsButton = new TextButton("Options", skin);
-        TextButton creditsButton = new TextButton("Credits", skin);
+        TextButton.TextButtonStyle buttonStyle = skin.get(TextButton.TextButtonStyle.class);
+        buttonStyle.font.getData().setScale(2); // Increase font size
 
-        table.add(startButton).fillX().uniformX();
-        table.row().pad(10, 0, 10, 0);
-        table.add(optionsButton).fillX().uniformX();
+        TextButton startButton = new TextButton("Start", buttonStyle);
+        TextButton optionsButton = new TextButton("Options", buttonStyle);
+        TextButton creditsButton = new TextButton("Credits", buttonStyle);
+
+        float buttonWidth = 300;
+        float buttonHeight = 100;
+        float padding = 20;
+
+        table.add(startButton).width(buttonWidth).height(buttonHeight).pad(padding);
         table.row();
-        table.add(creditsButton).fillX().uniformX();
+        table.add(optionsButton).width(buttonWidth).height(buttonHeight).pad(padding);
+        table.row();
+        table.add(creditsButton).width(buttonWidth).height(buttonHeight).pad(padding);
     }
 
     @Override

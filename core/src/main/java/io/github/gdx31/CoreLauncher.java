@@ -3,17 +3,19 @@ package io.github.gdx31;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
-import com.badlogic.gdx.math.Rectangle;
-
-import java.util.*;
+import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
+import com.badlogic.gdx.maps.tiled.TmxMapLoader;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.github.tommyettinger.textra.FWSkin;
+import com.github.tommyettinger.textra.TypingLabel;
 
 public class CoreLauncher extends ApplicationAdapter {
     private SpriteBatch batch;
@@ -26,6 +28,8 @@ public class CoreLauncher extends ApplicationAdapter {
     private Room currentRoom;
     private MainMenu mainMenu;
     private boolean isMenuVisible;
+    private Stage stage;
+    private TypingLabel typingLabel;
 
     @Override
     public void create() {
@@ -47,6 +51,13 @@ public class CoreLauncher extends ApplicationAdapter {
 
         mainMenu = new MainMenu();
         isMenuVisible = false;
+
+        stage = new Stage(new ScreenViewport());
+
+        FWSkin skin = new FWSkin(Gdx.files.internal("ui/uiskin.json"));
+        typingLabel = new TypingLabel("Welcome to the Game! I am your guide", skin);
+        typingLabel.setPosition(10, Gdx.graphics.getHeight() - 50);
+        stage.addActor(typingLabel);
     }
 
     @Override
@@ -83,7 +94,6 @@ public class CoreLauncher extends ApplicationAdapter {
                 collisionHandler.moveWithCollisionAndCheckIfOnTheFloor(deltaTime, gameObject, currentRoom.getCollisions().values());
                 gameObject.tileObject.setX(gameObject.position.x);
                 gameObject.tileObject.setY(gameObject.position.y);
-
             }
 
             HeroMovementHandler.handleHeroMovement(hero, onTheFloor, deltaTime);
@@ -97,11 +107,12 @@ public class CoreLauncher extends ApplicationAdapter {
                     if (gameObject.kills) {
                         worldState.playerKilled();
                     }
-
-
                 }
             }
         }
+
+        stage.act(Gdx.graphics.getDeltaTime());
+        stage.draw();
     }
 
     @Override
@@ -110,6 +121,7 @@ public class CoreLauncher extends ApplicationAdapter {
         if (isMenuVisible) {
             mainMenu.resize(width, height);
         }
+        stage.getViewport().update(width, height, true);
     }
 
     @Override
@@ -118,6 +130,7 @@ public class CoreLauncher extends ApplicationAdapter {
         if (isMenuVisible) {
             mainMenu.hide();
         }
+        stage.dispose();
     }
 
     public void showMenu() {
