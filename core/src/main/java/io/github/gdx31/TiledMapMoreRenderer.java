@@ -1,17 +1,14 @@
 package io.github.gdx31;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 
 import static com.badlogic.gdx.graphics.g2d.Batch.*;
-import static com.badlogic.gdx.graphics.g2d.Batch.U2;
 
 public class TiledMapMoreRenderer extends OrthogonalTiledMapRenderer {
     public TiledMapMoreRenderer(TiledMap map) {
