@@ -10,12 +10,15 @@ import com.badlogic.gdx.maps.tiled.TiledMapRenderer;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.github.tommyettinger.textra.FWSkin;
 import com.github.tommyettinger.textra.TypingLabel;
+import com.github.tommyettinger.textra.TypingListener;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class CoreLauncher extends ApplicationAdapter {
     private SpriteBatch batch;
@@ -30,6 +33,12 @@ public class CoreLauncher extends ApplicationAdapter {
     private boolean isMenuVisible;
     private Stage stage;
     private TypingLabel typingLabel;
+    private List<String> texts = Arrays.asList(
+        "Welcome to the Game! I am your guide.%",
+        "Did you know? You can jump by pressing the space bar.%",
+        "Watch out for the enemies! They can be tricky.%"
+    );
+    private int currentTextIndex = ~0;
 
     @Override
     public void create() {
@@ -55,14 +64,36 @@ public class CoreLauncher extends ApplicationAdapter {
         stage = new Stage(new ScreenViewport());
 
         FWSkin skin = new FWSkin(Gdx.files.internal("ui/uiskin.json"));
-        typingLabel = new TypingLabel("Welcome to the Game! I am your guide", skin);
+        typingLabel = new TypingLabel("        ", skin);
         typingLabel.setPosition(10, Gdx.graphics.getHeight() - 50);
         stage.addActor(typingLabel);
+
+        typingLabel.setTypingListener(new TypingListenerAdapter() {
+            @Override
+            public void onChar(long ch) {
+                if ((char)ch == '%') {
+                    currentTextIndex = ~currentTextIndex;
+                }
+            }
+        });
+
+    }
+
+    private void nextText() {
+        if (currentTextIndex < texts.size()) {
+            typingLabel.setText(texts.get(currentTextIndex));
+            typingLabel.restart();
+        }
+        currentTextIndex++;
     }
 
     @Override
     public void render() {
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
+        if (currentTextIndex < 0) {
+            currentTextIndex = ~currentTextIndex;
+            nextText();
+        }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             if (isMenuVisible) {
@@ -96,7 +127,7 @@ public class CoreLauncher extends ApplicationAdapter {
                 gameObject.tileObject.setY(gameObject.position.y);
             }
 
-            HeroMovementHandler.handleHeroMovement(hero, onTheFloor, deltaTime);
+            HeroMovementHandler.handleHeroMovement(hero, onTheFloor, deltaTime, currentRoom.getCollisions().values());
 
             for (GameObject gameObject : currentRoom.getGameObjects()) {
                 if (gameObject == hero) continue;
