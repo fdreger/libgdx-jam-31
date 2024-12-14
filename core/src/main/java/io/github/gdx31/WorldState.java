@@ -7,6 +7,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
 
 import java.util.*;
 
@@ -43,6 +44,8 @@ public class WorldState {
                     go.velocity.set(getFloatWithFallback("dx", go.tileObject), getFloatWithFallback("dy", go.tileObject));
                     go.type = (String) go.tileObject.getProperties().get("type");
                     go.bounces = getBooleanWithFallback("bounces", go.tileObject);
+                    go.kills = getBooleanWithFallback("kills", go.tileObject);
+                    go.savePoint = getBooleanWithFallback("savePoint", go.tileObject);
                     if (go.type == null) {
                         go.type = go.tileObject.getTile().getProperties().get("type", String.class);
                     }
@@ -50,6 +53,7 @@ public class WorldState {
                         hero = go;
                         hero.position.width = 6;
                         hero.position.height = 6;
+                        savePoint.set(hero.position.x, hero.position.y);
                     }
                     addGameObjectToRoom(go);
                 }
@@ -124,5 +128,17 @@ public class WorldState {
             }
         }
         return null;
+    }
+
+    private Vector2 savePoint = new Vector2();
+
+    public void setSavePoint(float x, float y) {
+        // remember save point for when player gets killed
+        savePoint.set(x, y);
+    }
+
+    public void playerKilled() {
+        hero.position.set(savePoint.x, savePoint.y, hero.position.width, hero.position.height);
+        hero.velocity.set(0, 0);
     }
 }

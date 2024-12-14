@@ -2,6 +2,7 @@ package io.github.gdx31;
 
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
@@ -23,6 +24,8 @@ public class CoreLauncher extends ApplicationAdapter {
     private WorldState worldState;
     private CollisionHandler collisionHandler;
     private Room currentRoom;
+    private MainMenu mainMenu;
+    private boolean isMenuVisible;
 
     @Override
     public void create() {
@@ -41,48 +44,89 @@ public class CoreLauncher extends ApplicationAdapter {
         renderer = new TiledMapMoreRenderer(map, batch);
 
         currentRoom = worldState.getCurrentRoom(worldState.getHero());
+
+        mainMenu = new MainMenu();
+        isMenuVisible = false;
     }
 
     @Override
     public void render() {
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
 
-        GameObject hero = worldState.getHero();
-        Room newRoom = worldState.getCurrentRoom(hero);
-        if (newRoom != currentRoom) {
-            currentRoom = newRoom;
-            camera.position.set(currentRoom.getBounds().x + currentRoom.getBounds().width / 2, currentRoom.getBounds().y + currentRoom.getBounds().height / 2, 0);
-            camera.update();
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            if (isMenuVisible) {
+                hideMenu();
+            } else {
+                showMenu();
+            }
         }
 
-        renderer.setView(camera);
-        renderer.render();
+        if (isMenuVisible) {
+            mainMenu.render(Gdx.graphics.getDeltaTime());
+        } else {
+            GameObject hero = worldState.getHero();
+            Room newRoom = worldState.getCurrentRoom(hero);
+            if (newRoom != currentRoom) {
+                currentRoom = newRoom;
+                camera.position.set(currentRoom.getBounds().x + currentRoom.getBounds().width / 2, currentRoom.getBounds().y + currentRoom.getBounds().height / 2, 0);
+                camera.update();
+            }
 
-        float deltaTime = Gdx.graphics.getDeltaTime();
+            renderer.setView(camera);
+            renderer.render();
+
+            float deltaTime = Gdx.graphics.getDeltaTime();
+            boolean onTheFloor = collisionHandler.moveWithCollisionAndCheckIfOnTheFloor(deltaTime, hero, currentRoom.getCollisions().values());
+
+            for (GameObject gameObject : currentRoom.getGameObjects()) {
+                if (gameObject == hero) continue;
+                collisionHandler.moveWithCollisionAndCheckIfOnTheFloor(deltaTime, gameObject, currentRoom.getCollisions().values());
+                gameObject.tileObject.setX(gameObject.position.x);
+                gameObject.tileObject.setY(gameObject.position.y);
+
+            }
+
+            HeroMovementHandler.handleHeroMovement(hero, onTheFloor, deltaTime);
+
+            for (GameObject gameObject : currentRoom.getGameObjects()) {
+                if (gameObject == hero) continue;
+                if (gameObject.position.overlaps(hero.position)) {
+                    if (gameObject.savePoint) {
+                        worldState.setSavePoint(gameObject.position.x, gameObject.position.y);
+                    }
+                    if (gameObject.kills) {
+                        worldState.playerKilled();
+                    }
 
 
-        boolean onTheFloor = collisionHandler.moveWithCollisionAndCheckIfOnTheFloor(deltaTime, hero, currentRoom.getCollisions().values());
-        for (GameObject gameObject : currentRoom.getGameObjects()) {
-            if (gameObject == hero) continue;
-            collisionHandler.moveWithCollisionAndCheckIfOnTheFloor(deltaTime, gameObject, currentRoom.getCollisions().values());
+                }
+            }
         }
-        HeroMovementHandler.handleHeroMovement(hero, onTheFloor, deltaTime);
-
-        for (GameObject gameObject : currentRoom.getGameObjects()) {
-            if (gameObject == hero) continue;
-            gameObject.tileObject.setX(gameObject.position.x);
-            gameObject.tileObject.setY(gameObject.position.y);
-        }
-        hero.tileObject.setX(hero.position.x);
-        hero.tileObject.setY(hero.position.y);
-    }
-
-    @Override
-    public void dispose() {
     }
 
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height, true);
+        if (isMenuVisible) {
+            mainMenu.resize(width, height);
+        }
+    }
+
+    @Override
+    public void dispose() {
+        batch.dispose();
+        if (isMenuVisible) {
+            mainMenu.hide();
+        }
+    }
+
+    public void showMenu() {
+        isMenuVisible = true;
+        mainMenu.show();
+    }
+
+    public void hideMenu() {
+        isMenuVisible = false;
+        mainMenu.hide();
     }
 }

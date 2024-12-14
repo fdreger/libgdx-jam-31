@@ -8,8 +8,9 @@ public class GameObject {
     public final Rectangle position = new Rectangle();
     public final Vector2 velocity = new Vector2();
 
-    public boolean moves;
+    public boolean kills;
     public boolean bounces;
+    public boolean savePoint;
     public TiledMapTileMapObject tileObject;
     public String type;
 

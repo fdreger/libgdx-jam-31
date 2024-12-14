@@ -38,5 +38,10 @@ public class HeroMovementHandler {
         }
 
         hero.velocity.y -= GRAVITY_ACCELERATION * deltaTime;
+
+        hero.tileObject.setX(hero.position.x);
+        hero.tileObject.setY(hero.position.y);
+
+
     }
 }

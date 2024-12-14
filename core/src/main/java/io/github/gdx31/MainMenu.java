@@ -17,7 +17,7 @@ public class MainMenu extends ScreenAdapter {
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
 
-        skin = new Skin(Gdx.files.internal("uskin.json"));
+        skin = new Skin(Gdx.files.internal("ui/uiskin.json"));
 
         Table table = new Table();
         table.setFillParent(true);

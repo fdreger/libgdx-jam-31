@@ -12,11 +12,17 @@
    <property name="bounces" type="bool" value="true"/>
    <property name="dx" type="float" value="20"/>
    <property name="dy" type="float" value="20"/>
+   <property name="kills" type="bool" value="true"/>
   </properties>
+  <animation>
+   <frame tileid="298" duration="100"/>
+   <frame tileid="202" duration="100"/>
+  </animation>
  </tile>
  <tile id="435">
   <properties>
    <property name="no-collision" type="bool" value="true"/>
+   <property name="savePoint" type="bool" value="true"/>
   </properties>
   <animation>
    <frame tileid="435" duration="100"/>
